@@ -11,7 +11,7 @@ public class NetworkManager {
 
     typealias NewsCompletion = (Result<[NewsModel]>) -> Void
 
-    func fetchTrendedGifs(source: String, sortBy: String, completionHandler: @escaping NewsCompletion) {
+    func fetchNews(source: String, sortBy: String, completionHandler: @escaping NewsCompletion) {
 
         request(url: Constants.url, parameters: getParameters(source: source, sortBy: sortBy)) { result -> Void in
             completionHandler(result)

@@ -3,13 +3,35 @@ import SafariServices
 
 class NewsViewController: UIViewController {
 
-    @IBOutlet var tableView: UITableView!
+    @IBOutlet weak var tableView: UITableView!
     fileprivate var newsDataSource: [NewsModel] = []
+
+    fileprivate var isRequesting = false
+    private let networkManager = NetworkManager()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        retrieveNews()
     }
 
+    func retrieveNews() {
+        guard !isRequesting else { return }
+
+        networkManager.fetchNews(source: "bild", sortBy: "top") { [weak self] response -> Void in
+            guard let `self` = self else { return }
+
+            switch response {
+            case .success(let value):
+                if value.count > 0 {
+                    self.newsDataSource.append(contentsOf: value)
+                }
+                self.tableView.reloadData()
+            case .failure(let error):
+                let alert = self.showAlert(error.localizedDescription)
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+    }
 }
 
 // MARK: - UITableView Delegate
@@ -30,6 +52,7 @@ extension NewsViewController: UITableViewDelegate {
 
 // MARK: UITableView Data Source
 extension NewsViewController: UITableViewDataSource {
+
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return newsDataSource.count

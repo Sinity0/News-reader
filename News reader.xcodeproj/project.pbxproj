@@ -17,6 +17,7 @@
 		835A99B31FA0B82C004234BC /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A99B21FA0B82C004234BC /* NetworkManager.swift */; };
 		835A99B51FA0B851004234BC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A99B41FA0B851004234BC /* Constants.swift */; };
 		835A99B71FA0BD81004234BC /* NewsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A99B61FA0BD81004234BC /* NewsModel.swift */; };
+		835A99B91FA0DEBC004234BC /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A99B81FA0DEBC004234BC /* Utils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 		835A99B21FA0B82C004234BC /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		835A99B41FA0B851004234BC /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		835A99B61FA0BD81004234BC /* NewsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsModel.swift; sourceTree = "<group>"; };
+		835A99B81FA0DEBC004234BC /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		A86223B506F77154B762F7EC /* Pods-News reader.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-News reader.release.xcconfig"; path = "Pods/Target Support Files/Pods-News reader/Pods-News reader.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -128,6 +130,7 @@
 				835A99A21FA09169004234BC /* Assets.xcassets */,
 				835A99981FA09169004234BC /* AppDelegate.swift */,
 				835A99B41FA0B851004234BC /* Constants.swift */,
+				835A99B81FA0DEBC004234BC /* Utils.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -276,6 +279,7 @@
 				835A99B71FA0BD81004234BC /* NewsModel.swift in Sources */,
 				835A99B51FA0B851004234BC /* Constants.swift in Sources */,
 				835A99B31FA0B82C004234BC /* NetworkManager.swift in Sources */,
+				835A99B91FA0DEBC004234BC /* Utils.swift in Sources */,
 				835A99A11FA09169004234BC /* News_reader.xcdatamodeld in Sources */,
 				835A999B1FA09169004234BC /* NewsViewController.swift in Sources */,
 				835A99991FA09169004234BC /* AppDelegate.swift in Sources */,
