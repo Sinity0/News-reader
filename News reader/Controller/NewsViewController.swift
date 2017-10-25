@@ -15,6 +15,17 @@ class NewsViewController: UIViewController {
 // MARK: - UITableView Delegate
 extension NewsViewController: UITableViewDelegate {
 
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+
+        let news = newsDataSource[indexPath.row]
+        if let urlStr = news.url {
+            guard let url = URL(string: urlStr) else { return }
+            let webViewController = SFSafariViewController(url: url)
+            webViewController.delegate = self
+            present(webViewController, animated: true, completion: nil)
+        }
+    }
 }
 
 // MARK: UITableView Data Source
@@ -25,11 +36,17 @@ extension NewsViewController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let news = newsDataSource[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier) as UITableViewCell!
-        return cell!
-    }
 
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier) else {
+            let cell = UITableViewCell()
+            return cell
+        }
+
+        let news = newsDataSource[indexPath.row]
+        cell.textLabel?.text = news.title
+        cell.detailTextLabel?.text = news.description
+        return cell
+    }
 }
 
 // MARK: Safari delegate
