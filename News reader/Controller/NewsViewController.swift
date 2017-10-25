@@ -4,11 +4,10 @@ import SafariServices
 class NewsViewController: UIViewController {
 
     @IBOutlet var tableView: UITableView!
-    fileprivate var newsDataSource: [NewsModel] = [] //[GifModel]()
+    fileprivate var newsDataSource: [NewsModel] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
     }
 
 }
@@ -26,6 +25,7 @@ extension NewsViewController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let news = newsDataSource[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier) as UITableViewCell!
         return cell!
     }
