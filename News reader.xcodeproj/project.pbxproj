@@ -18,6 +18,7 @@
 		835A99B51FA0B851004234BC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A99B41FA0B851004234BC /* Constants.swift */; };
 		835A99B71FA0BD81004234BC /* NewsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A99B61FA0BD81004234BC /* NewsModel.swift */; };
 		835A99B91FA0DEBC004234BC /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A99B81FA0DEBC004234BC /* Utils.swift */; };
+		835A99BB1FA1D677004234BC /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A99BA1FA1D677004234BC /* CoreDataManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		835A99B41FA0B851004234BC /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		835A99B61FA0BD81004234BC /* NewsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsModel.swift; sourceTree = "<group>"; };
 		835A99B81FA0DEBC004234BC /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		835A99BA1FA1D677004234BC /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		A86223B506F77154B762F7EC /* Pods-News reader.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-News reader.release.xcconfig"; path = "Pods/Target Support Files/Pods-News reader/Pods-News reader.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -139,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				835A999F1FA09169004234BC /* News_reader.xcdatamodeld */,
+				835A99BA1FA1D677004234BC /* CoreDataManager.swift */,
 			);
 			path = "Core Data";
 			sourceTree = "<group>";
@@ -282,6 +285,7 @@
 				835A99B91FA0DEBC004234BC /* Utils.swift in Sources */,
 				835A99A11FA09169004234BC /* News_reader.xcdatamodeld in Sources */,
 				835A999B1FA09169004234BC /* NewsViewController.swift in Sources */,
+				835A99BB1FA1D677004234BC /* CoreDataManager.swift in Sources */,
 				835A99991FA09169004234BC /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
