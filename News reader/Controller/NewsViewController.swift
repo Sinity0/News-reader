@@ -1,5 +1,6 @@
 import UIKit
 import SafariServices
+import CoreData
 
 class NewsViewController: UIViewController {
 
@@ -8,6 +9,7 @@ class NewsViewController: UIViewController {
 
     fileprivate var isRequesting = false
     private let networkManager = NetworkManager()
+    private let coreDataManager = CoreDataManager()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,8 +18,9 @@ class NewsViewController: UIViewController {
 
     func retrieveNews() {
         guard !isRequesting else { return }
+        isRequesting = true
 
-        networkManager.fetchNews(source: "bild", sortBy: "top") { [weak self] response -> Void in
+        networkManager.fetchNews(source: "engadget", sortBy: "latest") {[weak self] response -> Void in
             guard let `self` = self else { return }
 
             switch response {
@@ -25,10 +28,26 @@ class NewsViewController: UIViewController {
                 if value.count > 0 {
                     self.newsDataSource.append(contentsOf: value)
                 }
+                self.updateNewsDB()
                 self.tableView.reloadData()
+                self.isRequesting = false
             case .failure(let error):
-                let alert = self.showAlert(error.localizedDescription)
-                self.present(alert, animated: true, completion: nil)
+                self.present(self.showAlert(title: "News reader", message: error.localizedDescription), animated: true, completion: nil)
+                self.isRequesting = false
+            }
+        }
+    }
+
+    func updateNewsDB() {
+
+        for item in newsDataSource {
+            guard let title = item.title, let description = item.description, let url = item.url else { return }
+            do {
+                try coreDataManager.saveNews(title: title, description: description, url: url)
+            } catch let error as CustomError {
+                self.present(self.showAlert(title: error.title, message: error.localizedDescription), animated: true, completion: nil)
+            } catch let error {
+                self.present(self.showAlert(title: "News reader", message: error.localizedDescription), animated: true, completion: nil)
             }
         }
     }
@@ -52,7 +71,6 @@ extension NewsViewController: UITableViewDelegate {
 
 // MARK: UITableView Data Source
 extension NewsViewController: UITableViewDataSource {
-
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return newsDataSource.count
