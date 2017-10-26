@@ -40,6 +40,8 @@ class NewsViewController: UIViewController {
 
     func updateNewsDB() {
 
+        coreDataManager.deleteOldRecords()
+
         for item in newsDataSource {
             guard let title = item.title, let description = item.description, let url = item.url else { return }
             do {

@@ -1,14 +1,12 @@
 import UIKit
 
 public struct CustomError: LocalizedError {
-    var title: String
-    var description: String? { return _description }
+    let title: String
+    let description: String?
 
-    private var _description: String
-
-    init(title: String?, description: String) {
+    init(title: String?, description: String?) {
         self.title = title ?? "Error"
-        self._description = description
+        self.description = description
     }
 }
 
