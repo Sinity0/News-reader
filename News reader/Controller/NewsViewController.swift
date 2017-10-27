@@ -32,10 +32,10 @@ class NewsViewController: UIViewController {
             try fetchedNews = coreDataManager.fetchNews()
         } catch let error as CustomError{
             self.present(self.showAlert(title: error.title,
-                                        message: error.description ?? "Something went wrong."), animated: true, completion: nil)
+                                        message: error.description ?? "Something went wrong."), animated: true)
             return
         } catch {
-            self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true, completion: nil)
+            self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true)
             return
         }
 
@@ -63,13 +63,13 @@ class NewsViewController: UIViewController {
             switch response {
             case .success(let value):
                 self.newsDataSource.removeAll()
-                if value.count > 0 {
+                if !value.isEmpty {
                     self.newsDataSource.append(contentsOf: value)
                 }
                 self.tableView.reloadData()
                 self.updateNewsDB()
             case .failure(let error):
-                self.present(self.showAlert(title: "News reader", message: error.localizedDescription), animated: true, completion: nil)
+                self.present(self.showAlert(title: "News reader", message: error.localizedDescription), animated: true)
                 self.isRequesting = false
             }
         }
@@ -80,10 +80,10 @@ class NewsViewController: UIViewController {
             try coreDataManager.deleteOldRecords()
         } catch let error as CustomError{
             self.present(self.showAlert(title: error.title,
-                                        message: error.description ?? "Something went wrong."), animated: true, completion: nil)
+                                        message: error.description ?? "Something went wrong."), animated: true)
             return
         } catch {
-            self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true, completion: nil)
+            self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true)
             return
         }
 
@@ -93,9 +93,9 @@ class NewsViewController: UIViewController {
                 try coreDataManager.saveNews(title: title, description: description, url: url)
             } catch let error as CustomError{
                 self.present(self.showAlert(title: error.title,
-                                            message: error.description ?? "Something went wrong."), animated: true, completion: nil)
+                                            message: error.description ?? "Something went wrong."), animated: true)
             } catch {
-                self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true, completion: nil)
+                self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true)
             }
         }
     }
@@ -111,7 +111,7 @@ extension NewsViewController: UITableViewDelegate {
             guard let url = URL(string: urlStr) else { return }
             let webViewController = SFSafariViewController(url: url)
             webViewController.delegate = self
-            present(webViewController, animated: true, completion: nil)
+            present(webViewController, animated: true)
         }
     }
 }
@@ -138,6 +138,6 @@ extension NewsViewController: UITableViewDataSource {
 // MARK: Safari delegate
 extension NewsViewController: SFSafariViewControllerDelegate {
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-        controller.dismiss(animated: true, completion: nil)
+        controller.dismiss(animated: true)
     }
 }
