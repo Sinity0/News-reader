@@ -9,17 +9,15 @@ public enum Result<Value> {
 
 public class NetworkManager {
 
-    typealias NewsCompletion = (Result<[NewsModel]>) -> Void
+    public typealias NewsCompletion = (Result<[NewsModel]>) -> Void
 
-    func fetchNews(source: String, sortBy: String, completionHandler: @escaping NewsCompletion) {
-
+    public func fetchNews(source: String, sortBy: String, completionHandler: @escaping NewsCompletion) {
         request(url: Constants.url, parameters: getParameters(source: source, sortBy: sortBy)) { result -> Void in
             completionHandler(result)
         }
     }
 
     private func getParameters(source: String, sortBy: String) -> [String: Any] {
-
         let parameters: [String: Any] = [
             "source": source,
             "sortBy": sortBy,
@@ -29,7 +27,6 @@ public class NetworkManager {
     }
 
     private func request(url: String, parameters: [String: Any], completion: @escaping NewsCompletion) {
-        
         Alamofire.request(url,
                           method: .get,
                           parameters: parameters,
@@ -44,5 +41,4 @@ public class NetworkManager {
                             }
         }
     }
-    
 }

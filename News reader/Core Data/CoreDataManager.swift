@@ -1,18 +1,16 @@
 import UIKit
 import CoreData
 
-class CoreDataManager {
+public class CoreDataManager {
 
-    func getContext () throws -> NSManagedObjectContext {
-
+    private func getContext () throws -> NSManagedObjectContext {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             throw CustomError(title: "CoreData", description: "Can't get AppDelegate")
         }
         return appDelegate.persistentContainer.viewContext
     }
 
-    func fetchNews() throws -> [News] {
-
+    public func fetchNews() throws -> [News] {
         let fetchRequest: NSFetchRequest<News> = News.fetchRequest()
         var fetchResult: [News] = []
 
@@ -26,8 +24,7 @@ class CoreDataManager {
         return fetchResult
     }
 
-    func saveNews(title: String, description: String, url: String) throws {
-
+    public func saveNews(title: String, description: String, url: String) throws {
         var managedContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
 
         do {
@@ -53,8 +50,7 @@ class CoreDataManager {
         }
     }
 
-    func deleteOldRecords() throws {
-
+    public func deleteOldRecords() throws {
         let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
 

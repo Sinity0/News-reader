@@ -7,13 +7,12 @@ class NewsViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     fileprivate var newsDataSource: [NewsModel] = []
 
-    fileprivate var isRequesting = false
+    private var isRequesting = false
     private let networkManager = NetworkManager()
     private let coreDataManager = CoreDataManager()
     private let isRegisteredForRemoteNotifications = UIApplication.shared.isRegisteredForRemoteNotifications
 
     override func viewDidLoad() {
-        
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(retrieveNewsFromProvidedSource),
@@ -27,8 +26,7 @@ class NewsViewController: UIViewController {
         }
     }
 
-    public func loadSavedNews() {
-
+    private func loadSavedNews() {
         var fetchedNews: [News] = []
         do {
             try fetchedNews = coreDataManager.fetchNews()
@@ -55,7 +53,6 @@ class NewsViewController: UIViewController {
     }
 
     @objc private func retrieveNewsFromProvidedSource() {
-
         guard !isRequesting else { return }
         isRequesting = true
 
@@ -78,8 +75,7 @@ class NewsViewController: UIViewController {
         }
     }
 
-    func updateNewsDB() {
-
+    private func updateNewsDB() {
         do {
             try coreDataManager.deleteOldRecords()
         } catch let error as CustomError{
@@ -107,7 +103,6 @@ class NewsViewController: UIViewController {
 
 // MARK: - UITableView Delegate
 extension NewsViewController: UITableViewDelegate {
-
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
 
@@ -123,13 +118,11 @@ extension NewsViewController: UITableViewDelegate {
 
 // MARK: UITableView Data Source
 extension NewsViewController: UITableViewDataSource {
-
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return newsDataSource.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
         guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier) else {
             let cell = UITableViewCell()
             return cell
@@ -144,7 +137,6 @@ extension NewsViewController: UITableViewDataSource {
 
 // MARK: Safari delegate
 extension NewsViewController: SFSafariViewControllerDelegate {
-
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
         controller.dismiss(animated: true, completion: nil)
     }
