@@ -3,9 +3,11 @@ import CoreData
 
 class CoreDataManager {
 
-    func getContext () -> NSManagedObjectContext {
+    func getContext () throws -> NSManagedObjectContext {
 
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            throw CustomError(title: "CoreData", description: "Can't get AppDelegate")
+        }
         return appDelegate.persistentContainer.viewContext
     }
 
@@ -16,21 +18,24 @@ class CoreDataManager {
 
         do {
             fetchResult = try getContext().fetch(fetchRequest)
-        } catch {
-            print("Fetch request error: \(error)")
+        } catch let error as NSError {
+            throw CustomError(title: "CoreData", description: error.localizedDescription)
         }
         return fetchResult
     }
 
     func saveNews(title: String, description: String, url: String) throws {
 
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            return
+        var managedContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+
+        do {
+            try managedContext = getContext()
+        } catch let error as NSError {
+            throw CustomError(title: "CoreData", description: error.localizedDescription)
         }
 
-        let managedContext = appDelegate.persistentContainer.viewContext
         guard let entity = NSEntityDescription.entity(forEntityName: "News", in: managedContext) else {
-            return
+            throw CustomError(title: "CoreData", description: "Can't get context")
         }
         
         let news = NSManagedObject(entity: entity, insertInto: managedContext)
@@ -48,18 +53,20 @@ class CoreDataManager {
 
     func deleteOldRecords() throws {
 
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            throw CustomError(title: "CoreData", description: "Can't get AppDelegate")
-        }
+        var managedContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
 
-        let context = appDelegate.persistentContainer.viewContext
+        do {
+            try managedContext = getContext()
+        } catch let error as NSError {
+            throw CustomError(title: "CoreData", description: error.localizedDescription)
+        }
 
         let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
 
         do {
-            try context.execute(deleteRequest)
-            try context.save()
+            try managedContext.execute(deleteRequest)
+            try managedContext.save()
         } catch let error as NSError {
             throw CustomError(title: "CoreData", description: error.localizedDescription)
         }
