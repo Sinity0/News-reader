@@ -9,15 +9,28 @@ class CoreDataManager {
         return appDelegate.persistentContainer.viewContext
     }
 
-    func saveNews(title: String, description: String, url: String) -> CustomError {
+    func fetchNews() -> [News] {
+
+        let fetchRequest: NSFetchRequest<News> = News.fetchRequest()
+        var fetchResult: [News] = []
+
+        do {
+            fetchResult = try getContext().fetch(fetchRequest)
+        } catch {
+            print("Fetch request error: \(error)")
+        }
+        return fetchResult
+    }
+
+    func saveNews(title: String, description: String, url: String) {
 
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            return CustomError(title: "Core Data", description: "Can't get AppDelegate instance.")
+            return
         }
 
         let managedContext = appDelegate.persistentContainer.viewContext
         guard let entity = NSEntityDescription.entity(forEntityName: "News", in: managedContext) else {
-            return CustomError(title: "CoreDate", description: "Can't get entity.")
+            return
         }
         
         let news = NSManagedObject(entity: entity, insertInto: managedContext)
@@ -29,21 +42,23 @@ class CoreDataManager {
         do {
             try managedContext.save()
         } catch let error as NSError {
-            return CustomError(title: "CoreData", description: error.localizedDescription)
+            print(error.localizedDescription)
         }
-        return CustomError(title: "CoreData", description: "Something went wrong.")
     }
 
     func deleteOldRecords() {
 
-        let deleteFetch: NSFetchRequest<News> = News.fetchRequest()
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch as! NSFetchRequest<NSFetchRequestResult>)
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let context = appDelegate.persistentContainer.viewContext
+
+        let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
 
         do {
-            try getContext().execute(deleteRequest)
-            try getContext().save()
+            try context.execute(deleteRequest)
+            try context.save()
         } catch {
-            print("Error when deleting old records: \(error)")
+            print ("There was an error")
         }
     }
 }

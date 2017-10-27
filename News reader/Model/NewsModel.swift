@@ -9,6 +9,12 @@ struct NewsModel: Mappable {
     init?(map: Map) {
     }
 
+    init?(title: String, description: String, url: String) {
+        self.title = title
+        self.description = description
+        self.url = url
+    }
+
     mutating func mapping(map: Map) {
         title <- map["title"]
         description <- map["description"]

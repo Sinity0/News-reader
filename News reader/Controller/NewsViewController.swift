@@ -10,27 +10,55 @@ class NewsViewController: UIViewController {
     fileprivate var isRequesting = false
     private let networkManager = NetworkManager()
     private let coreDataManager = CoreDataManager()
+    private let isRegisteredForRemoteNotifications = UIApplication.shared.isRegisteredForRemoteNotifications
 
     override func viewDidLoad() {
+        
         super.viewDidLoad()
-        retrieveNews()
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(retrieveNewsFromProvidedSource),
+                                               name: Notification.Name(Constants.notificationKey),
+                                               object: nil)
+
+        if isRegisteredForRemoteNotifications {
+            loadSavedNews()
+        } else {
+            retrieveNewsFromProvidedSource()
+        }
     }
 
-    func retrieveNews() {
+    public func loadSavedNews() {
+
+        let news: [NewsModel] = coreDataManager.fetchNews().flatMap {
+            if let title = $0.value(forKey: "title") as? String,
+                let description = $0.value(forKey: "descr") as? String,
+                let url = $0.value(forKey: "url") as? String {
+                return NewsModel(title: title,
+                                 description: description,
+                                 url: url)
+            }
+            return nil
+        }
+        newsDataSource.append(contentsOf: news)
+    }
+
+    @objc private func retrieveNewsFromProvidedSource() {
+
         guard !isRequesting else { return }
         isRequesting = true
 
-        networkManager.fetchNews(source: "engadget", sortBy: "latest") {[weak self] response -> Void in
+        networkManager.fetchNews(source: Constants.newsSource, sortBy: "latest") {[weak self] response -> Void in
             guard let `self` = self else { return }
+            self.isRequesting = false
 
             switch response {
             case .success(let value):
+                self.newsDataSource.removeAll()
                 if value.count > 0 {
                     self.newsDataSource.append(contentsOf: value)
                 }
-                self.updateNewsDB()
                 self.tableView.reloadData()
-                self.isRequesting = false
+                self.updateNewsDB()
             case .failure(let error):
                 self.present(self.showAlert(title: "News reader", message: error.localizedDescription), animated: true, completion: nil)
                 self.isRequesting = false
@@ -44,13 +72,7 @@ class NewsViewController: UIViewController {
 
         for item in newsDataSource {
             guard let title = item.title, let description = item.description, let url = item.url else { return }
-            do {
-                try coreDataManager.saveNews(title: title, description: description, url: url)
-            } catch let error as CustomError {
-                self.present(self.showAlert(title: error.title, message: error.localizedDescription), animated: true, completion: nil)
-            } catch let error {
-                self.present(self.showAlert(title: "News reader", message: error.localizedDescription), animated: true, completion: nil)
-            }
+            coreDataManager.saveNews(title: title, description: description, url: url)
         }
     }
 }
@@ -99,4 +121,3 @@ extension NewsViewController: SFSafariViewControllerDelegate {
         controller.dismiss(animated: true, completion: nil)
     }
 }
-
