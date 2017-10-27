@@ -9,7 +9,7 @@ class CoreDataManager {
         return appDelegate.persistentContainer.viewContext
     }
 
-    func fetchNews() -> [News] {
+    func fetchNews() throws -> [News] {
 
         let fetchRequest: NSFetchRequest<News> = News.fetchRequest()
         var fetchResult: [News] = []
@@ -22,7 +22,7 @@ class CoreDataManager {
         return fetchResult
     }
 
-    func saveNews(title: String, description: String, url: String) {
+    func saveNews(title: String, description: String, url: String) throws {
 
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
@@ -46,9 +46,12 @@ class CoreDataManager {
         }
     }
 
-    func deleteOldRecords() {
+    func deleteOldRecords() throws {
 
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            throw CustomError(title: "CoreData", description: "Can't get AppDelegate")
+        }
+
         let context = appDelegate.persistentContainer.viewContext
 
         let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
@@ -57,8 +60,8 @@ class CoreDataManager {
         do {
             try context.execute(deleteRequest)
             try context.save()
-        } catch {
-            print ("There was an error")
+        } catch let error as NSError {
+            throw CustomError(title: "CoreData", description: error.localizedDescription)
         }
     }
 }

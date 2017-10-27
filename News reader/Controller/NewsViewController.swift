@@ -29,7 +29,19 @@ class NewsViewController: UIViewController {
 
     public func loadSavedNews() {
 
-        let news: [NewsModel] = coreDataManager.fetchNews().flatMap {
+        var fetchedNews: [News] = []
+        do {
+            try fetchedNews = coreDataManager.fetchNews()
+        } catch let error as CustomError{
+            self.present(self.showAlert(title: error.title,
+                                        message: error.description ?? "Something went wrong."), animated: true, completion: nil)
+            return
+        } catch {
+            self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true, completion: nil)
+            return
+        }
+
+        let news: [NewsModel] = fetchedNews.flatMap {
             if let title = $0.value(forKey: "title") as? String,
                 let description = $0.value(forKey: "descr") as? String,
                 let url = $0.value(forKey: "url") as? String {
@@ -68,11 +80,27 @@ class NewsViewController: UIViewController {
 
     func updateNewsDB() {
 
-        coreDataManager.deleteOldRecords()
+        do {
+            try coreDataManager.deleteOldRecords()
+        } catch let error as CustomError{
+            self.present(self.showAlert(title: error.title,
+                                        message: error.description ?? "Something went wrong."), animated: true, completion: nil)
+            return
+        } catch {
+            self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true, completion: nil)
+            return
+        }
 
         for item in newsDataSource {
             guard let title = item.title, let description = item.description, let url = item.url else { return }
-            coreDataManager.saveNews(title: title, description: description, url: url)
+            do {
+                try coreDataManager.saveNews(title: title, description: description, url: url)
+            } catch let error as CustomError{
+                self.present(self.showAlert(title: error.title,
+                                            message: error.description ?? "Something went wrong."), animated: true, completion: nil)
+            } catch {
+                self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true, completion: nil)
+            }
         }
     }
 }
