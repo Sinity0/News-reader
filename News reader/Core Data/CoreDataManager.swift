@@ -18,6 +18,8 @@ class CoreDataManager {
 
         do {
             fetchResult = try getContext().fetch(fetchRequest)
+        } catch let error as CustomError {
+            throw error
         } catch let error as NSError {
             throw CustomError(title: "CoreData", description: error.localizedDescription)
         }
@@ -53,20 +55,14 @@ class CoreDataManager {
 
     func deleteOldRecords() throws {
 
-        var managedContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-
-        do {
-            try managedContext = getContext()
-        } catch let error as NSError {
-            throw CustomError(title: "CoreData", description: error.localizedDescription)
-        }
-
         let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
 
         do {
-            try managedContext.execute(deleteRequest)
-            try managedContext.save()
+            try getContext().execute(deleteRequest)
+            try getContext().save()
+        } catch let error as CustomError {
+            throw error
         } catch let error as NSError {
             throw CustomError(title: "CoreData", description: error.localizedDescription)
         }
