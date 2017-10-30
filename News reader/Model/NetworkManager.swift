@@ -2,14 +2,9 @@ import Foundation
 import Alamofire
 import AlamofireObjectMapper
 
-public enum Result<Value> {
-    case success(Value)
-    case failure(Error)
-}
-
 public class NetworkManager {
 
-    public typealias NewsCompletion = (Result<[NewsModel]>) -> Void
+    public typealias NewsCompletion = (Alamofire.Result<[NewsModel]>) -> Void
 
     public func fetchNews(source: String, sortBy: String, completionHandler: @escaping NewsCompletion) {
         request(url: Constants.url, parameters: getParameters(source: source, sortBy: sortBy)) { result -> Void in
@@ -33,7 +28,6 @@ public class NetworkManager {
                           encoding: URLEncoding.default).responseArray(keyPath: "articles") { (response: DataResponse<[NewsModel]>) in
 
                             switch response.result {
-
                             case .failure(let error):
                                 completion(.failure(error))
                             case .success(let value):
