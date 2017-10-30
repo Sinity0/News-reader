@@ -3,8 +3,9 @@ import CoreData
 
 public class CoreDataManager {
 
-    // MARK: - Core Data stack
-    lazy var persistentContainer: NSPersistentContainer = {
+    static let sharedInstance = CoreDataManager()
+    
+    private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "News_reader")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
@@ -14,8 +15,8 @@ public class CoreDataManager {
         return container
     }()
 
-    // MARK: - Core Data Saving support
-    func saveContext () {
+
+    public func saveContext () {
         let context = persistentContainer.viewContext
         if context.hasChanges {
             do {
@@ -27,18 +28,13 @@ public class CoreDataManager {
         }
     }
 
-    private func getContext () throws -> NSManagedObjectContext {
-        return self.persistentContainer.viewContext
-    }
-
     public func fetchNews() throws -> [News] {
+        let managedContext = persistentContainer.viewContext
         let fetchRequest: NSFetchRequest<News> = News.fetchRequest()
         var fetchResult: [News] = []
 
         do {
-            fetchResult = try getContext().fetch(fetchRequest)
-        } catch let error as CustomError {
-            throw error
+            fetchResult = try managedContext.fetch(fetchRequest)
         } catch let error as NSError {
             throw CustomError(title: "CoreData", description: error.localizedDescription)
         }
@@ -46,13 +42,7 @@ public class CoreDataManager {
     }
 
     public func saveNews(title: String, description: String, url: String) throws {
-        var managedContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-
-        do {
-            try managedContext = getContext()
-        } catch let error as NSError {
-            throw CustomError(title: "CoreData", description: error.localizedDescription)
-        }
+        let managedContext = persistentContainer.viewContext
 
         guard let entity = NSEntityDescription.entity(forEntityName: "News", in: managedContext) else {
             throw CustomError(title: "CoreData", description: "Can't get context")
@@ -66,18 +56,6 @@ public class CoreDataManager {
 
         do {
             try managedContext.save()
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-    }
-
-    public func deleteOldRecords() throws {
-        let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
-
-        do {
-            try getContext().execute(deleteRequest)
-            try getContext().save()
         } catch let error as CustomError {
             throw error
         } catch let error as NSError {

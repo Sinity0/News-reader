@@ -2,25 +2,24 @@ import Foundation
 import Alamofire
 import AlamofireObjectMapper
 
-public enum Result<Value> {
-    case success(Value)
-    case failure(Error)
+public enum sortBy {
+    case top, latest
 }
 
 public class NetworkManager {
 
-    public typealias NewsCompletion = (Result<[NewsModel]>) -> Void
+    public typealias NewsCompletion = (Alamofire.Result<[NewsModel]>) -> Void
 
-    public func fetchNews(source: String, sortBy: String, completionHandler: @escaping NewsCompletion) {
+    public func fetchNews(source: String, sortBy: sortBy, completionHandler: @escaping NewsCompletion) {
         request(url: Constants.url, parameters: getParameters(source: source, sortBy: sortBy)) { result -> Void in
             completionHandler(result)
         }
     }
 
-    private func getParameters(source: String, sortBy: String) -> [String: Any] {
+    private func getParameters(source: String, sortBy: sortBy) -> [String: Any] {
         let parameters: [String: Any] = [
             "source": source,
-            "sortBy": sortBy,
+            "sortBy": sortBy == .top ? "top" : "latest",
             "apiKey": Constants.apiKey
         ]
         return parameters
@@ -33,7 +32,6 @@ public class NetworkManager {
                           encoding: URLEncoding.default).responseArray(keyPath: "articles") { (response: DataResponse<[NewsModel]>) in
 
                             switch response.result {
-
                             case .failure(let error):
                                 completion(.failure(error))
                             case .success(let value):

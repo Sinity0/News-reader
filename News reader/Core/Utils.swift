@@ -1,4 +1,14 @@
 import UIKit
+import Alamofire
+
+class Connectivity {
+    class func isConnectedToInternet() throws -> Bool {
+        guard let connectivityManager = NetworkReachabilityManager() else {
+            throw CustomError(title: "News reader", description: "No internet connection.")
+        }
+        return connectivityManager.isReachable
+    }
+}
 
 public struct CustomError: LocalizedError {
     let title: String
