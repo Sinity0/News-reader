@@ -2,20 +2,24 @@ import Foundation
 import Alamofire
 import AlamofireObjectMapper
 
+public enum sortBy {
+    case top, latest
+}
+
 public class NetworkManager {
 
     public typealias NewsCompletion = (Alamofire.Result<[NewsModel]>) -> Void
 
-    public func fetchNews(source: String, sortBy: String, completionHandler: @escaping NewsCompletion) {
+    public func fetchNews(source: String, sortBy: sortBy, completionHandler: @escaping NewsCompletion) {
         request(url: Constants.url, parameters: getParameters(source: source, sortBy: sortBy)) { result -> Void in
             completionHandler(result)
         }
     }
 
-    private func getParameters(source: String, sortBy: String) -> [String: Any] {
+    private func getParameters(source: String, sortBy: sortBy) -> [String: Any] {
         let parameters: [String: Any] = [
             "source": source,
-            "sortBy": sortBy,
+            "sortBy": sortBy == .top ? "top" : "latest",
             "apiKey": Constants.apiKey
         ]
         return parameters

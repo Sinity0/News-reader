@@ -50,24 +50,23 @@ class NewsViewController: UIViewController {
             return nil
         }
         newsDataSource.append(contentsOf: news)
+        tableView.reloadData()
     }
 
     @objc private func retrieveNewsFromProvidedSource() {
         guard !isRequesting else { return }
         isRequesting = true
 
-        networkManager.fetchNews(source: Constants.newsSource, sortBy: "latest") {[weak self] response -> Void in
+        networkManager.fetchNews(source: Constants.newsSource, sortBy: sortBy.latest) {[weak self] response -> Void in
             guard let `self` = self else { return }
             self.isRequesting = false
 
             switch response {
             case .success(let value):
-                self.newsDataSource.removeAll()
                 if !value.isEmpty {
-                    self.newsDataSource.append(contentsOf: value)
+                    self.updateNewsDB(with: value)
+                    self.loadSavedNews()
                 }
-                self.tableView.reloadData()
-                self.updateNewsDB()
             case .failure(let error):
                 self.present(self.showAlert(title: "News reader", message: error.localizedDescription), animated: true)
                 self.isRequesting = false
@@ -75,19 +74,8 @@ class NewsViewController: UIViewController {
         }
     }
 
-    private func updateNewsDB() {
-        do {
-            try coreDataManager.deleteOldRecords()
-        } catch let error as CustomError {
-            self.present(self.showAlert(title: error.title,
-                                        message: error.description ?? "Something went wrong."), animated: true)
-            return
-        } catch {
-            self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true)
-            return
-        }
-
-        for item in newsDataSource {
+    private func updateNewsDB(with: [NewsModel]) {
+        for item in with {
             guard let title = item.title, let description = item.description, let url = item.url else { return }
             do {
                 try coreDataManager.saveNews(title: title, description: description, url: url)

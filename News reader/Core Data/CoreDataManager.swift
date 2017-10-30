@@ -59,19 +59,4 @@ public class CoreDataManager {
             throw CustomError(title: "CoreData", description: error.localizedDescription)
         }
     }
-
-    public func deleteOldRecords() throws {
-        let managedContext = persistentContainer.viewContext
-        let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
-
-        do {
-            try managedContext.execute(deleteRequest)
-            try managedContext.save()
-        } catch let error as CustomError {
-            throw error
-        } catch let error as NSError {
-            throw CustomError(title: "CoreData", description: error.localizedDescription)
-        }
-    }
 }
