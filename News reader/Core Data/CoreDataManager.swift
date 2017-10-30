@@ -3,11 +3,32 @@ import CoreData
 
 public class CoreDataManager {
 
-    private func getContext () throws -> NSManagedObjectContext {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            throw CustomError(title: "CoreData", description: "Can't get AppDelegate")
+    // MARK: - Core Data stack
+    lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "News_reader")
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        return container
+    }()
+
+    // MARK: - Core Data Saving support
+    func saveContext () {
+        let context = persistentContainer.viewContext
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
         }
-        return appDelegate.persistentContainer.viewContext
+    }
+
+    private func getContext () throws -> NSManagedObjectContext {
+        return self.persistentContainer.viewContext
     }
 
     public func fetchNews() throws -> [News] {
