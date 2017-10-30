@@ -29,8 +29,8 @@ class NewsViewController: UIViewController {
     private func loadSavedNews() {
         var fetchedNews: [News] = []
         do {
-            try fetchedNews = coreDataManager.fetchNews()
-        } catch let error as CustomError{
+            fetchedNews = try coreDataManager.fetchNews()
+        } catch let error as CustomError {
             self.present(self.showAlert(title: error.title,
                                         message: error.description ?? "Something went wrong."), animated: true)
             return
@@ -78,7 +78,7 @@ class NewsViewController: UIViewController {
     private func updateNewsDB() {
         do {
             try coreDataManager.deleteOldRecords()
-        } catch let error as CustomError{
+        } catch let error as CustomError {
             self.present(self.showAlert(title: error.title,
                                         message: error.description ?? "Something went wrong."), animated: true)
             return
@@ -91,7 +91,7 @@ class NewsViewController: UIViewController {
             guard let title = item.title, let description = item.description, let url = item.url else { return }
             do {
                 try coreDataManager.saveNews(title: title, description: description, url: url)
-            } catch let error as CustomError{
+            } catch let error as CustomError {
                 self.present(self.showAlert(title: error.title,
                                             message: error.description ?? "Something went wrong."), animated: true)
             } catch {
