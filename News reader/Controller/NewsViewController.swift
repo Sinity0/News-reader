@@ -9,7 +9,6 @@ class NewsViewController: UIViewController {
 
     private var isRequesting = false
     private let networkManager = NetworkManager()
-    private let coreDataManager = CoreDataManager()
     private let isRegisteredForRemoteNotifications = UIApplication.shared.isRegisteredForRemoteNotifications
 
     override func viewDidLoad() {
@@ -18,18 +17,30 @@ class NewsViewController: UIViewController {
                                                selector: #selector(retrieveNewsFromProvidedSource),
                                                name: Notification.Name(Constants.notificationKey),
                                                object: nil)
-
-        if isRegisteredForRemoteNotifications {
-            loadSavedNews()
-        } else {
+        if !isRegisteredForRemoteNotifications, checkInternetConnection() {
             retrieveNewsFromProvidedSource()
+        } else {
+            loadSavedNews()
+        }
+    }
+
+    private func checkInternetConnection() -> Bool {
+        do {
+            return try Connectivity.isConnectedToInternet()
+        } catch let error as CustomError {
+            self.present(self.showAlert(title: error.title,
+                                        message: error.description ?? "Something went wrong."), animated: true)
+            return false
+        } catch {
+            self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true)
+            return false
         }
     }
 
     private func loadSavedNews() {
         var fetchedNews: [News] = []
         do {
-            fetchedNews = try coreDataManager.fetchNews()
+            fetchedNews = try CoreDataManager.sharedInstance.fetchNews()
         } catch let error as CustomError {
             self.present(self.showAlert(title: error.title,
                                         message: error.description ?? "Something went wrong."), animated: true)
@@ -40,9 +51,9 @@ class NewsViewController: UIViewController {
         }
 
         let news: [NewsModel] = fetchedNews.flatMap {
-            if let title = $0.value(forKey: "title") as? String,
-                let description = $0.value(forKey: "descr") as? String,
-                let url = $0.value(forKey: "url") as? String {
+            if let title = $0.title,
+                let description = $0.descr,
+                let url = $0.url {
                 return NewsModel(title: title,
                                  description: description,
                                  url: url)
@@ -78,7 +89,7 @@ class NewsViewController: UIViewController {
         for item in with {
             guard let title = item.title, let description = item.description, let url = item.url else { return }
             do {
-                try coreDataManager.saveNews(title: title, description: description, url: url)
+                try CoreDataManager.sharedInstance.saveNews(title: title, description: description, url: url)
             } catch let error as CustomError {
                 self.present(self.showAlert(title: error.title,
                                             message: error.description ?? "Something went wrong."), animated: true)

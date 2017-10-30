@@ -6,7 +6,7 @@ import UserNotifications
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var coreDataManager = CoreDataManager()
+    //var coreDataManager = CoreDataManager()
 
     func registerForPushNotifications() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) {(granted, error) in
@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
-        coreDataManager.saveContext()
+        CoreDataManager.sharedInstance.saveContext()
     }
 
 

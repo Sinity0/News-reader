@@ -3,6 +3,8 @@ import CoreData
 
 public class CoreDataManager {
 
+    static let sharedInstance = CoreDataManager()
+
     private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "News_reader")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
