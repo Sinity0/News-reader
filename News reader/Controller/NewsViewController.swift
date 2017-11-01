@@ -5,7 +5,7 @@ import CoreData
 class NewsViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
-    fileprivate var newsDataSource: [NewsModel] = []
+    fileprivate var newsDataSource: [News] = []
 
     private var isRequesting = false
     private let networkManager = NetworkManager()
@@ -27,7 +27,7 @@ class NewsViewController: UIViewController {
     private func checkInternetConnection() -> Bool {
         do {
             return try Connectivity.isConnectedToInternet()
-        } catch let error as CustomError {
+        } catch let error as AttributedError {
             self.present(self.showAlert(title: error.title,
                                         message: error.description ?? "Something went wrong."), animated: true)
             return false
@@ -41,7 +41,7 @@ class NewsViewController: UIViewController {
         var fetchedNews: [News] = []
         do {
             fetchedNews = try CoreDataManager.sharedInstance.fetchNews()
-        } catch let error as CustomError {
+        } catch let error as AttributedError {
             self.present(self.showAlert(title: error.title,
                                         message: error.description ?? "Something went wrong."), animated: true)
             return
@@ -49,18 +49,8 @@ class NewsViewController: UIViewController {
             self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true)
             return
         }
-
-        let news: [NewsModel] = fetchedNews.flatMap {
-            if let title = $0.title,
-                let description = $0.descr,
-                let url = $0.url {
-                return NewsModel(title: title,
-                                 description: description,
-                                 url: url)
-            }
-            return nil
-        }
-        newsDataSource.append(contentsOf: news)
+        newsDataSource.removeAll()
+        newsDataSource.append(contentsOf: fetchedNews)
         tableView.reloadData()
     }
 
@@ -75,7 +65,17 @@ class NewsViewController: UIViewController {
             switch response {
             case .success(let value):
                 if !value.isEmpty {
-                    self.updateNewsDB(with: value)
+                    var val: [News] = []
+                    do {
+                        try CoreDataManager.sharedInstance.deleteOldRecords()
+                        val = try self.parse(data: value)
+                    } catch let error as AttributedError {
+                        self.present(self.showAlert(title: error.title,
+                                                    message: error.description ?? "Something went wrong."), animated: true)
+                    } catch {
+                        self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true)
+                    }
+                    self.updateNewsDB(with: val)
                     self.loadSavedNews()
                 }
             case .failure(let error):
@@ -85,16 +85,38 @@ class NewsViewController: UIViewController {
         }
     }
 
-    private func updateNewsDB(with: [NewsModel]) {
+    private func parse(data: [[String: Any]]) throws -> [News] {
+        var result: [News] = []
+
+        let managedContext = CoreDataManager.sharedInstance.persistentContainer.viewContext
+
+        guard let entity = NSEntityDescription.entity(forEntityName: "News", in: managedContext) else {
+            throw AttributedError(title: "CoreData", description: "Can't get context")
+        }
+
+        for item in data {
+            let newsItem = News(entity: entity, insertInto: managedContext)
+            if let title = item["title"] as? String,
+                let description = item["description"] as? String,
+                let url = item["url"] as? String {
+                    newsItem.title = title
+                    newsItem.descr = description
+                    newsItem.url = url
+                    result.append(newsItem)
+            }
+        }
+        return result
+    }
+
+    public func updateNewsDB(with: [News]) {
         for item in with {
-            guard let title = item.title, let description = item.description, let url = item.url else { return }
             do {
-                try CoreDataManager.sharedInstance.saveNews(title: title, description: description, url: url)
-            } catch let error as CustomError {
+                try CoreDataManager.sharedInstance.saveNews(data: item)
+            } catch let error as AttributedError {
                 self.present(self.showAlert(title: error.title,
                                             message: error.description ?? "Something went wrong."), animated: true)
             } catch {
-                self.present(self.showAlert(title: "News reader", message: "Something went wrong."), animated: true)
+                self.present(self.showAlert(title: "NewsModel reader", message: "Something went wrong."), animated: true)
             }
         }
     }
@@ -129,7 +151,7 @@ extension NewsViewController: UITableViewDataSource {
 
         let news = newsDataSource[indexPath.row]
         cell.textLabel?.text = news.title
-        cell.detailTextLabel?.text = news.description
+        cell.detailTextLabel?.text = news.descr
         return cell
     }
 }

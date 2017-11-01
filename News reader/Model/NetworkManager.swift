@@ -7,8 +7,7 @@ public enum sortBy {
 }
 
 public class NetworkManager {
-
-    public typealias NewsCompletion = (Alamofire.Result<[NewsModel]>) -> Void
+    public typealias NewsCompletion = (Alamofire.Result<[[String: Any]]>) -> Void
 
     public func fetchNews(source: String, sortBy: sortBy, completionHandler: @escaping NewsCompletion) {
         request(url: Constants.url, parameters: getParameters(source: source, sortBy: sortBy)) { result -> Void in
@@ -25,18 +24,24 @@ public class NetworkManager {
         return parameters
     }
 
-    private func request(url: String, parameters: [String: Any], completion: @escaping NewsCompletion) {
+    public func request(url: String, parameters: [String: Any], completion: @escaping NewsCompletion) {
         Alamofire.request(url,
                           method: .get,
                           parameters: parameters,
-                          encoding: URLEncoding.default).responseArray(keyPath: "articles") { (response: DataResponse<[NewsModel]>) in
+                          encoding: URLEncoding.default).responseJSON( completionHandler: { response in
 
-                            switch response.result {
-                            case .failure(let error):
-                                completion(.failure(error))
-                            case .success(let value):
-                                completion(.success(value))
-                            }
-        }
+            switch response.result {
+
+            case .failure(let error):
+                print(error)
+                completion(.failure(error))
+            case .success(let value):
+
+                if let json = value as? [String: Any] {
+                    guard let articles = json["articles"] as? [[String: Any]] else { return }
+                    completion(.success(articles))
+                }
+            }
+        })
     }
 }
