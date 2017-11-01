@@ -108,6 +108,15 @@ class NewsViewController: UIViewController {
     }
 
     public func updateNewsDB(with: [News]) {
+        do {
+            try CoreDataManager.sharedInstance.deleteOldRecords()
+        } catch let error as AttributedError {
+            self.present(self.showAlert(title: error.title,
+                                        message: error.description ?? "Something went wrong."), animated: true)
+        } catch {
+            self.present(self.showAlert(title: "NewsModel reader", message: "Something went wrong."), animated: true)
+        }
+
         for item in with {
             do {
                 try CoreDataManager.sharedInstance.saveNews(data: item)

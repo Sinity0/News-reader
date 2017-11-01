@@ -7,8 +7,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    let coreDataManager = CoreDataManager()
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         registerForPushNotifications()
         return true
@@ -54,7 +52,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         #endif
     }
 
-    func applicationWillTerminate(_ application: UIApplication) {
-        CoreDataManager.sharedInstance.saveContext()
-    }
 }
