@@ -70,21 +70,4 @@ public class CoreDataManager {
             }
         }
     }
-
-    public func deleteOldRecords() throws {
-        let managedContext = persistentContainer.viewContext
-        let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
-
-        do {
-            try managedContext.execute(deleteRequest)
-            try managedContext.save()
-        } catch let error as AttributedError {
-            throw error
-        } catch let error as NSError {
-            throw AttributedError(title: "CoreData", description: error.localizedDescription)
-        }
-        managedContext.reset()
-    }
-
 }

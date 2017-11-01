@@ -67,7 +67,6 @@ class NewsViewController: UIViewController {
                 if !value.isEmpty {
                     var val: [News] = []
                     do {
-                        try CoreDataManager.sharedInstance.deleteOldRecords()
                         val = try self.parse(data: value)
                     } catch let error as AttributedError {
                         self.present(self.showAlert(title: error.title,
